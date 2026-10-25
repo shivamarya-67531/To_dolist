@@ -36,11 +36,16 @@
     button { color: inherit; }
     .app-shell { width: min(1080px, calc(100% - 48px)); margin: 0 auto; }
     .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 5;
       height: 88px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       border-bottom: 1px solid rgb(96 115 99 / 12%);
+      background: rgb(246 247 242 / 94%);
+      backdrop-filter: blur(14px);
     }
     .brand { display: flex; align-items: center; gap: 11px; font-weight: 750; letter-spacing: -.045em; }
     .brand-mark {
@@ -48,6 +53,18 @@
       border-radius: 11px; color: #fff; background: var(--green);
     }
     .brand-mark svg { width: 19px; }
+    .main-nav { display: flex; align-items: center; gap: 5px; }
+    .nav-link {
+      padding: 9px 12px;
+      border-radius: 8px;
+      color: #687168;
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: color .18s, background .18s;
+    }
+    .nav-link:hover, .nav-link:focus-visible { color: var(--green-dark); background: var(--green-soft); }
+    .nav-link:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
     .top-date { color: var(--muted); font-size: 13px; font-weight: 550; }
 
     main { padding: 59px 0 80px; }
@@ -170,7 +187,9 @@
     }
     @media (max-width: 480px) {
       .app-shell { width: calc(100% - 24px); }
-      .topbar { height: 70px; }
+      .topbar { height: auto; min-height: 64px; flex-wrap: wrap; padding: 10px 0 0; }
+      .main-nav { order: 1; width: 100%; justify-content: center; padding: 6px 0 9px; border-top: 1px solid rgb(96 115 99 / 9%); }
+      .nav-link { padding: 7px 14px; }
       .top-date { font-size: 11px; }
       main { padding-top: 34px; }
       .subtitle { font-size: 13px; }
@@ -201,6 +220,11 @@
         </span>
         <span>daymark</span>
       </div>
+      <nav class="main-nav" aria-label="Main navigation">
+        <a class="nav-link" href="#page-title">Today</a>
+        <a class="nav-link" href="#tasks">My tasks</a>
+        <a class="nav-link" href="#overview">Progress</a>
+      </nav>
       <time class="top-date" id="today"></time>
     </header>
 
@@ -212,7 +236,7 @@
       </section>
 
       <div class="workspace">
-        <section class="task-card" aria-label="Your tasks">
+        <section class="task-card" id="tasks" aria-label="Your tasks">
           <form class="add-form" id="task-form">
             <label class="input-wrap">
               <span class="sr-only">New task</span>
@@ -249,7 +273,7 @@
           <p class="sr-only" id="status-message" role="status"></p>
         </section>
 
-        <aside class="side-column" aria-label="Daily overview">
+        <aside class="side-column" id="overview" aria-label="Daily overview">
           <section class="side-card">
             <div class="progress-heading">
               <h2 class="side-label">Today's progress</h2>
