@@ -43,29 +43,48 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid rgb(96 115 99 / 12%);
-      background: rgb(246 247 242 / 94%);
-      backdrop-filter: blur(14px);
+      padding: 0 20px;
+      border-bottom: 1px solid rgb(255 255 255 / 12%);
+      border-radius: 0 0 15px 15px;
+      color: #fff;
+      background: linear-gradient(110deg, #345741, #476f57 62%, #52795d);
+      box-shadow: 0 8px 24px rgb(37 62 45 / 16%);
     }
     .brand { display: flex; align-items: center; gap: 11px; font-weight: 750; letter-spacing: -.045em; }
     .brand-mark {
       width: 34px; height: 34px; display: grid; place-items: center;
-      border-radius: 11px; color: #fff; background: var(--green);
+      border-radius: 11px; color: var(--green-dark); background: #f5f7ee;
     }
     .brand-mark svg { width: 19px; }
     .main-nav { display: flex; align-items: center; gap: 5px; }
     .nav-link {
+      position: relative;
       padding: 9px 12px;
       border-radius: 8px;
-      color: #687168;
+      color: #e2ecdf;
       font-size: 12px;
       font-weight: 600;
       text-decoration: none;
-      transition: color .18s, background .18s;
+      transition: color .18s, background .18s, transform .18s;
     }
-    .nav-link:hover, .nav-link:focus-visible { color: var(--green-dark); background: var(--green-soft); }
-    .nav-link:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
-    .top-date { color: var(--muted); font-size: 13px; font-weight: 550; }
+    .nav-link:hover { color: #fff; background: rgb(255 255 255 / 12%); transform: translateY(-1px); }
+    .nav-link[aria-current="location"] {
+      color: var(--green-dark);
+      background: #f4f6ee;
+      box-shadow: 0 2px 8px rgb(22 47 31 / 16%);
+    }
+    .nav-link[aria-current="location"]::after {
+      position: absolute;
+      right: 12px;
+      bottom: 3px;
+      left: 12px;
+      height: 2px;
+      border-radius: 2px;
+      content: "";
+      background: var(--orange);
+    }
+    .nav-link:focus-visible { outline: 2px solid #f3c99e; outline-offset: 3px; }
+    .top-date { color: #e2ecdf; font-size: 13px; font-weight: 550; }
 
     main { padding: 59px 0 80px; }
     .intro { margin-bottom: 34px; animation: rise-in .55s cubic-bezier(.2,.75,.25,1) both; }
@@ -76,6 +95,7 @@
     .eyebrow::before { width: 19px; height: 1px; content: ""; background: var(--green); }
     h1 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(38px, 5vw, 53px); font-weight: 500; letter-spacing: -.055em; line-height: 1.1; }
     .subtitle { margin: 12px 0 0; color: var(--muted); font-size: 15px; }
+    #page-title, #tasks, #overview { scroll-margin-top: 110px; }
 
     .workspace {
       display: grid; grid-template-columns: minmax(0, 1fr) 270px; gap: 22px; align-items: start;
@@ -187,8 +207,8 @@
     }
     @media (max-width: 480px) {
       .app-shell { width: calc(100% - 24px); }
-      .topbar { height: auto; min-height: 64px; flex-wrap: wrap; padding: 10px 0 0; }
-      .main-nav { order: 1; width: 100%; justify-content: center; padding: 6px 0 9px; border-top: 1px solid rgb(96 115 99 / 9%); }
+      .topbar { height: auto; min-height: 64px; flex-wrap: wrap; padding: 10px 12px 0; }
+      .main-nav { order: 1; width: 100%; justify-content: center; padding: 6px 0 9px; border-top: 1px solid rgb(255 255 255 / 16%); }
       .nav-link { padding: 7px 14px; }
       .top-date { font-size: 11px; }
       main { padding-top: 34px; }
@@ -221,7 +241,7 @@
         <span>daymark</span>
       </div>
       <nav class="main-nav" aria-label="Main navigation">
-        <a class="nav-link" href="#page-title">Today</a>
+        <a class="nav-link" href="#page-title" aria-current="location">Today</a>
         <a class="nav-link" href="#tasks">My tasks</a>
         <a class="nav-link" href="#overview">Progress</a>
       </nav>
@@ -315,6 +335,7 @@
       const clearCompletedButton = document.querySelector("#clear-completed");
       const statusMessage = document.querySelector("#status-message");
       const filters = document.querySelectorAll(".filter-button");
+      const navLinks = document.querySelectorAll(".nav-link");
       let currentFilter = "all";
       let completingTaskId = null;
       let tasks = loadTasks();
@@ -322,6 +343,34 @@
       document.querySelector("#today").textContent = new Intl.DateTimeFormat(undefined, {
         weekday: "long", month: "long", day: "numeric"
       }).format(new Date());
+
+      function setCurrentNavLink(id) {
+        navLinks.forEach((link) => {
+          if (link.hash === `#${id}`) {
+            link.setAttribute("aria-current", "location");
+          } else {
+            link.removeAttribute("aria-current");
+          }
+        });
+      }
+
+      navLinks.forEach((link) => {
+        link.addEventListener("click", () => setCurrentNavLink(link.hash.slice(1)));
+      });
+
+      if ("IntersectionObserver" in window) {
+        const navObserver = new IntersectionObserver((entries) => {
+          const visibleSections = entries
+            .filter((entry) => entry.isIntersecting)
+            .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+          if (visibleSections.length > 0) setCurrentNavLink(visibleSections[0].target.id);
+        }, { rootMargin: "-15% 0px -65% 0px", threshold: [0, 0.25, 0.5, 0.75, 1] });
+
+        navLinks.forEach((link) => {
+          const section = document.querySelector(link.hash);
+          if (section) navObserver.observe(section);
+        });
+      }
 
       function loadTasks() {
         try {
