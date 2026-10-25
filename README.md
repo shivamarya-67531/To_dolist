@@ -64,13 +64,14 @@ The progress card updates as you complete tasks. A fresh list starts at 0%; fini
 | JavaScript | Task actions, filters, and progress |
 | Browser local storage | Saves your list on your device |
 
-Everything lives in one self-contained HTML file. No package installation or build command is needed.
+The HTML, CSS, and JavaScript are kept in separate parts of the project for easy editing. No package installation or build command is needed.
 
 ## 📁 Project layout
 
 ```text
 to_dolist/
-├── index.html   # The complete Daymark app
+├── index.html   # Page structure and app behavior
+├── styles.css   # Responsive design and animations
 └── README.md    # Project guide
 ```
 
