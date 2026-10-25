@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🌿 daymark
+# 🌿 daymark Application
 
 ### Make today count.
 
